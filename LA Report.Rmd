@@ -1,0 +1,104 @@
+---
+title: "LA Report"
+author: "Vivek Kumar and Pooja Rai"
+output: word_document
+---
+# **Exploratory Data Analysis**
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,include=FALSE}
+
+install.packages('tidyverse', repos = "http://cran.us.r-project.org")
+library("tidyverse")
+install.packages('ggplot2', repos = "http://cran.us.r-project.org")
+library("ggplot2")
+install.packages('knitr', repos = "http://cran.us.r-project.org")
+library("knitr")
+install.packages('dplyr', repos = "http://cran.us.r-project.org")
+library(dplyr)
+```
+To begin with, we import the data set into a data frame named my_data.
+```{r}
+my_data <- read.csv("COVID-19 India Statewise Vaccine Data.csv", header = TRUE, sep = ",")
+show(my_data)
+```
+The data set we are working on is a collection of the vaccination drive for COVID-19. The data includes state-wise distribution of each dose and cummilative doses administered.
+
+Further we add a few columns to make our analysis more relevant. Below we add the data on population of each state and calculate the total percentage of population vaccinated based on that data.
+
+```{r}
+my_data$populations <- c(380581,49576777,1383727,31205576,104099452,1055450,25545198,586956,16787941,1458545,60439692,25351462,6864602,12258433,32988134,61095297,33406061,274289,64473,72626809,112374333,2855794,2966889,1097206,1978502,41974218,1247953,27743338,68548437,610577,72147030,35004000,3673917,199812341,10086292,91276115,NA)
+
+f_data <- mutate(my_data, percent_vaccinated = (my_data$Dose.2*100)/my_data$populations)
+
+show(f_data)
+```
+
+After this we summarize our data using the summary method.
+
+```{r}
+summary(f_data)
+summary(f_data$Dose.1)
+summary(f_data$Dose.2)
+summary(f_data$Total.Vaccination.Doses)
+summary(f_data$percent_vaccinated)
+```
+
+From the summary we can observe that on an average 9073406 doses have been administered. Approximately 6.605% population has been vaccinated.
+
+Next, we find the maximum and minimum values in each respective column. We use the max and min functions for this with the first parameter as the variable and rm.na parameter to exclude the NA values.
+
+```{r}
+max(f_data$Dose.1)
+max(f_data$Dose.2)
+max(f_data$Total.Vaccination.Doses, na.rm = TRUE)
+max(f_data$percent_vaccinated, na.rm = TRUE)
+
+min(f_data$Dose.1)
+min(f_data$Dose.2)
+min(f_data$Total.Vaccination.Doses, na.rm = TRUE)
+min(f_data$percent_vaccinated, na.rm = TRUE)
+```
+
+The maximum population vaccinated in a specific state is 20.42%, in the state of Ladakh. On the other hand Bihar has the lowest vaccinated population of 2.12%.
+
+Maharashtra has administered the maximum number of doses and Lakshadweep has the lowest doses administered.
+
+## **PLOTS**
+
+#### Histograms
+
+We plot the histograms of each variable using the hist() function.
+```{r,}
+hist(f_data$Dose.1)
+hist(f_data$Dose.2)
+hist(f_data$Total.Vaccination.Doses)
+hist(f_data$percent_vaccinated)
+```
+
+Next we plot graphs for state-wise distribution of doses administered. ggplot is used for this. 
+```{r}
+ggplot(f_data, aes(x = Dose.1, y = State.UTs, col = State.UTs, size = Dose.1)) + geom_point()
+ggplot(f_data, aes(x = Dose.2, y = State.UTs, col = State.UTs, size = Dose.2)) + geom_point()
+ggplot(f_data, aes(x = Total.Vaccination.Doses, y = State.UTs, col = State.UTs, size = Total.Vaccination.Doses)) + geom_point()
+```
+
+Next we plot percentage vaccinated graph for all states/UTs. The size parameter helps us display the density of the variables. 
+```{r}
+ggplot(f_data, aes(x = percent_vaccinated, y = State.UTs, col = State.UTs, size = percent_vaccinated)) + geom_point()
+```
+
+A different style of representation can also be used as shown below. 
+
+```{r}
+ggplot(f_data, aes(x = Dose.1, y = State.UTs, col = State.UTs, fill = State.UTs)) + geom_bar(stat = "identity")
+
+ggplot(f_data, aes(x = Dose.2, y = State.UTs, col = State.UTs, fill = State.UTs)) + geom_bar(stat = "identity")
+
+ggplot(f_data, aes(x = Total.Vaccination.Doses, y = State.UTs, col = State.UTs, fill = State.UTs)) + geom_bar(stat = "identity")
+
+ggplot(f_data, aes(x = percent_vaccinated, y = State.UTs, col = State.UTs, fill = State.UTs)) + geom_bar(stat = "identity")
+```
+
